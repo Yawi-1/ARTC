@@ -18,7 +18,7 @@ const signup = asyncHandler(async (req, res) => {
     throw new ApiError("Username already exists!", 409);
   }
   const hashPassword = await bcrypt.hash(password, 10)
-  const user = await new User({ username, password: hashPassword, role })
+  const user =  new User({ username, password: hashPassword, role })
   await user.save()
   const token = generateToken(user._id)
   res.cookie('token', token, {
@@ -44,10 +44,24 @@ const login = asyncHandler(async (req, res) => {
     throw new ApiError("Invalid credentials", 401);
   }
   const token = generateToken(isUser._id)
-  res.cookies('token', token, {
-    expiresIn: '1h'
-  })
+  res.cookie('token', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV !== 'development',
+    maxAge: 60 * 60 * 1000
+  });
   res.json({ message: "Login  successfully!", data: { id: isUser._id, username: isUser.username, token, role: isUser.role } })
 });
 
-module.exports = { login, signup }
+const logout = asyncHandler(async (req, res) => {
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV !== 'development',
+    maxAge: 60 * 60 * 1000
+  });
+
+  return res.status(200).json({
+    success: true,
+    message: "User logged out"
+  });
+});
+module.exports = { login, signup, logout }
