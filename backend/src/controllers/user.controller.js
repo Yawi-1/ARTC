@@ -26,7 +26,7 @@ const signup = asyncHandler(async (req, res) => {
     secure: process.env.NODE_ENV !== 'development',
     maxAge: 60 * 60 * 1000
   });
-  res.json({ message: "User added successfully!", data: { id: user._id, username, token, role } })
+  res.json({ message: "User added successfully!", data: { id: user._id, username, role } })
 });
 
 const login = asyncHandler(async (req, res) => {
@@ -49,7 +49,7 @@ const login = asyncHandler(async (req, res) => {
     secure: process.env.NODE_ENV !== 'development',
     maxAge: 60 * 60 * 1000
   });
-  res.json({ message: "Login  successfully!", data: { id: isUser._id, username: isUser.username, token, role: isUser.role } })
+  res.json({ message: "Login  successfully!", data: { id: isUser._id, username: isUser.username, role: isUser.role } })
 });
 
 const logout = asyncHandler(async (req, res) => {
@@ -64,4 +64,5 @@ const logout = asyncHandler(async (req, res) => {
     message: "User logged out"
   });
 });
+
 module.exports = { login, signup, logout }
