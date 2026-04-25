@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema({
         required: true,
         trim: true,
         unique: true
-        
+
     },
     password: {
         type: String,
@@ -16,6 +16,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ['User', 'Admin'],
         default: 'User'
+    },
+    branch: {
+        type: String,
+        required: true
     }
 }, {
     timestamps: true

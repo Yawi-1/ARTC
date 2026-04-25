@@ -5,10 +5,10 @@ const ApiError = require('../utils/ApiError');
 const bcrypt = require('bcryptjs')
 
 // Generate JWT Token
-const generateToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '1h' })
+const generateToken = ({ id, branch }) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '1h' })
 
 const signup = asyncHandler(async (req, res) => {
-  const { username, password, role } = req.body;
+  const { username, password, role, branch } = req.body;
 
   if (!username || !password) {
     throw new ApiError("Username and password are required!", 400);
@@ -18,9 +18,9 @@ const signup = asyncHandler(async (req, res) => {
     throw new ApiError("Username already exists!", 409);
   }
   const hashPassword = await bcrypt.hash(password, 10)
-  const user =  new User({ username, password: hashPassword, role })
+  const user = new User({ username, password: hashPassword, branch, role })
   await user.save()
-  const token = generateToken(user._id)
+  const token = generateToken({ id: user._id, branch: user.branch });
   res.cookie('token', token, {
     httpOnly: true,
     secure: process.env.NODE_ENV !== 'development',
@@ -43,13 +43,16 @@ const login = asyncHandler(async (req, res) => {
   if (!isCorrect) {
     throw new ApiError("Invalid credentials", 401);
   }
-  const token = generateToken(isUser._id)
+  const token = generateToken({
+    id: isUser._id,
+    branch: isUser.branch
+  });
   res.cookie('token', token, {
     httpOnly: true,
     secure: process.env.NODE_ENV !== 'development',
     maxAge: 60 * 60 * 1000
   });
-  res.json({ message: "Login  successfully!", data: { id: isUser._id, username: isUser.username, role: isUser.role } })
+  res.json({ message: "Login  successfully!", data: { id: isUser._id, username: isUser.username, role: isUser.role, branch: isUser.branch } })
 });
 
 const logout = asyncHandler(async (req, res) => {
