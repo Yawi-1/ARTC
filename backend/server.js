@@ -9,6 +9,7 @@ const PORT = process.env.PORT || 5000;
 
 
 const userRoutes = require('./src/routes/user.routes')
+const transactionRoutes = require('./src/routes/transaction.routes')
 
 app.use(express.json())
 app.use(cookieParser())
@@ -21,6 +22,7 @@ app.use(cors({
 
 // ROutes 
 app.use('/api/auth', userRoutes)
+app.use('/api/transactions', transactionRoutes)
 app.get('/', (req, res) => { res.send('<h1>Hello from server</h1>') })
 
 

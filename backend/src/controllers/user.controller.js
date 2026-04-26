@@ -5,7 +5,7 @@ const ApiError = require('../utils/ApiError');
 const bcrypt = require('bcryptjs')
 
 // Generate JWT Token
-const generateToken = ({ id, branch }) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '1h' })
+const generateToken = ({ id, branch, role }) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '1h' })
 
 const signup = asyncHandler(async (req, res) => {
   const { username, password, role, branch } = req.body;
@@ -20,13 +20,13 @@ const signup = asyncHandler(async (req, res) => {
   const hashPassword = await bcrypt.hash(password, 10)
   const user = new User({ username, password: hashPassword, branch, role })
   await user.save()
-  const token = generateToken({ id: user._id, branch: user.branch });
+  const token = generateToken({ id: user._id, branch: user.branch, role: user.role });
   res.cookie('token', token, {
     httpOnly: true,
     secure: process.env.NODE_ENV !== 'development',
     maxAge: 60 * 60 * 1000
   });
-  res.json({ message: "User added successfully!", data: { id: user._id, username, role } })
+  res.json({ message: "User added successfully!", data: { id: user._id, username, role, branch } })
 });
 
 const login = asyncHandler(async (req, res) => {
@@ -45,7 +45,8 @@ const login = asyncHandler(async (req, res) => {
   }
   const token = generateToken({
     id: isUser._id,
-    branch: isUser.branch
+    branch: isUser.branch,
+    role: isUser.role
   });
   res.cookie('token', token, {
     httpOnly: true,

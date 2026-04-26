@@ -52,7 +52,7 @@ const getTransactions = asyncHandler(async (req, res) => {
     if (req.user.role === 'admin') {
         if (branch) filter.branch = branch; 
     } else {
-        filter.branch = req.user.branch; // normal user restricted
+        filter.branch = req.user.branch; 
     }
 
     // Optional filters
