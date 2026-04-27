@@ -8,8 +8,8 @@ const bcrypt = require('bcryptjs')
 const generateToken = (user) => {
   return jwt.sign(
     {
-      id: user._id,
-      branch: user.branch, 
+      id: user.id,
+      branch: user.branch,
       role: user.role
     },
     process.env.JWT_SECRET,
@@ -63,7 +63,7 @@ const login = asyncHandler(async (req, res) => {
     secure: process.env.NODE_ENV !== 'development',
     maxAge: 60 * 60 * 1000
   });
-  res.json({ message: "Login  successfully!", data: { id: isUser._id, username: isUser.username, role: isUser.role, branch: isUser.branch, token } })
+  res.json({ message: "Login  successfully!", data: { id: isUser._id, username: isUser.username, role: isUser.role, branch: isUser.branch } })
 });
 
 const logout = asyncHandler(async (req, res) => {
@@ -79,4 +79,20 @@ const logout = asyncHandler(async (req, res) => {
   });
 });
 
-module.exports = { login, signup, logout }
+const getMe = asyncHandler(async (req, res) => {
+  const { id } = req.user;
+  const user = await User.findById(id);
+  if (!user) {
+    throw new ApiError('User does not exist', 404)
+  }
+  res.status(200).json({
+    data: {
+      id: user._id,
+      username: user.username,
+      role: user.role,
+      branch: user.branch
+    }
+  })
+})
+
+module.exports = { login, signup, logout, getMe }
