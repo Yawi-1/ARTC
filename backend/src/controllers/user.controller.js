@@ -5,7 +5,17 @@ const ApiError = require('../utils/ApiError');
 const bcrypt = require('bcryptjs')
 
 // Generate JWT Token
-const generateToken = ({ id, branch, role }) => jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '1h' })
+const generateToken = (user) => {
+  return jwt.sign(
+    {
+      id: user._id,
+      branch: user.branch, 
+      role: user.role
+    },
+    process.env.JWT_SECRET,
+    { expiresIn: '1h' }
+  )
+}
 
 const signup = asyncHandler(async (req, res) => {
   const { username, password, role, branch } = req.body;
@@ -53,7 +63,7 @@ const login = asyncHandler(async (req, res) => {
     secure: process.env.NODE_ENV !== 'development',
     maxAge: 60 * 60 * 1000
   });
-  res.json({ message: "Login  successfully!", data: { id: isUser._id, username: isUser.username, role: isUser.role, branch: isUser.branch } })
+  res.json({ message: "Login  successfully!", data: { id: isUser._id, username: isUser.username, role: isUser.role, branch: isUser.branch, token } })
 });
 
 const logout = asyncHandler(async (req, res) => {

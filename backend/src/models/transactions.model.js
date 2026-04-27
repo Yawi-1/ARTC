@@ -2,8 +2,7 @@ const mongoose = require('mongoose')
 
 const transactionSchema = new mongoose.Schema({
     branch: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Branch',
+        type: String,
         required: true,
         index: true
     },
@@ -15,7 +14,8 @@ const transactionSchema = new mongoose.Schema({
     },
     amount: {
         type: Number,
-        required: true
+        required: true,
+        min:0
     },
     category: {
         type: String,
