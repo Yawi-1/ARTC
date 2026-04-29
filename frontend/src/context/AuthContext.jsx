@@ -1,26 +1,20 @@
 import React, { createContext, useState, useContext, useEffect, useCallback } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from "../utils/axiosInstance";
 
 const AuthContext = createContext();
-
-const api = "http://localhost:3000/api/auth";
-
-const axiosInstance = axios.create({
-  baseURL: api,
-  withCredentials: true,
-});
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(false); 
   const navigate = useNavigate();
 
-  // ✅ memoized login
+ 
   const login = useCallback(async (data) => {
     try {
       setAuthLoading(true);
-      const res = await axiosInstance.post("/login", data);
+      const res = await axiosInstance.post("/auth/login", data);
 
       setUser(res.data.data);
       navigate("/");
@@ -35,17 +29,16 @@ export const AuthProvider = ({ children }) => {
   const fetchUser = useCallback(async () => {
     setAuthLoading(true)
     try {
-      const res = await axiosInstance.get("/me");
+      const res = await axiosInstance.get("/auth/me");
       setUser(res.data.data);
     } catch (error) {
-      // silent fail (user not logged in)
       setUser(null);
     } finally {
       setAuthLoading(false);
     }
   }, []);
 
-  // ✅ run only once
+ 
   useEffect(() => {
     if (!user) {
       fetchUser();
