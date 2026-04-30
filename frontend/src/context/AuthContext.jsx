@@ -7,16 +7,17 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [authLoading, setAuthLoading] = useState(false); 
+  const [authLoading, setAuthLoading] = useState(false);
   const navigate = useNavigate();
 
- 
+
   const login = useCallback(async (data) => {
     try {
       setAuthLoading(true);
       const res = await axiosInstance.post("/auth/login", data);
 
       setUser(res.data.data);
+      alert(res.data.message)
       navigate("/");
     } catch (error) {
       alert(error.response?.data?.message || "Login failed");
@@ -25,7 +26,18 @@ export const AuthProvider = ({ children }) => {
     }
   }, [navigate]);
 
-  
+  const logout = useCallback(async () => {
+    try {
+      const res = await axiosInstance.post('/auth/logout')
+      alert(res.data.message)
+      setUser(null)
+    } catch (error) {
+      alert(error.response?.data?.message || "Something went wrong");
+    }
+
+  }, [])
+
+
   const fetchUser = useCallback(async () => {
     setAuthLoading(true)
     try {
@@ -38,7 +50,7 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
- 
+
   useEffect(() => {
     if (!user) {
       fetchUser();
@@ -48,7 +60,7 @@ export const AuthProvider = ({ children }) => {
   }, []); // 🔥 no dependency
 
   return (
-    <AuthContext.Provider value={{ user, login, authLoading }}>
+    <AuthContext.Provider value={{ user, login, authLoading, logout }}>
       {children}
     </AuthContext.Provider>
   );

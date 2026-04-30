@@ -3,7 +3,12 @@ const ApiError = require('../utils/ApiError');
 const asyncHandler = require('../utils/asynHandler')
 
 const addTransaction = asyncHandler(async (req, res) => {
-    const { branch } = req.user
+    let branch;
+    if (req.user.role === "Admin") {
+        branch = req.body.branch || req.user.branch; 
+    } else {
+        branch = req.user.branch;
+    }
     const { type, amount, category, remarks } = req.body;
     if (!type || !amount || !category) {
         throw new ApiError('All fields are required', 400)
@@ -12,7 +17,7 @@ const addTransaction = asyncHandler(async (req, res) => {
     const transaction = new Transaction({ branch, type, amount, category, remarks })
     await transaction.save()
 
-    res.json({ message: 'New transaction added', data: { id: transaction._id, branch, type, amount, category, remarks } })
+    res.json({ message: 'New transaction added', data: transaction })
 })
 
 const updateTransaction = asyncHandler(async (req, res) => {
@@ -24,7 +29,7 @@ const updateTransaction = asyncHandler(async (req, res) => {
     }
 
     const transaction = await Transaction.findOneAndUpdate(
-        { _id: id, branch: req.user.branch }, 
+        { _id: id, branch: req.user.branch },
         { type, amount, category, remarks },
         { new: true, runValidators: true }
     );
@@ -39,20 +44,19 @@ const updateTransaction = asyncHandler(async (req, res) => {
     });
 });
 const getTransactions = asyncHandler(async (req, res) => {
-    let { page = 1, limit = 10, branch, type, category } = req.query;
+    let { page = 1, limit = 2, branch, type, category } = req.query;
 
     page = parseInt(page);
     limit = parseInt(limit);
 
     const skip = (page - 1) * limit;
 
-    // 🔐 Role-based filtering
     let filter = {};
 
-    if (req.user.role === 'admin') {
-        if (branch) filter.branch = branch; 
+    if (req.user.role === 'Admin') {
+        if (branch) filter.branch = branch;
     } else {
-        filter.branch = req.user.branch; 
+        filter.branch = req.user.branch;
     }
 
     // Optional filters
@@ -104,7 +108,7 @@ const deleteTransaction = asyncHandler(async (req, res) => {
     // ✅ If admin → delete anything
     if (req.user.role === 'admin') {
         transaction = await Transaction.findByIdAndDelete(id);
-    } 
+    }
     // ✅ Normal user → restricted delete
     else {
         transaction = await Transaction.findOneAndDelete({
@@ -123,4 +127,4 @@ const deleteTransaction = asyncHandler(async (req, res) => {
     });
 });
 
-module.exports = {addTransaction,updateTransaction,getTransactions,deleteTransaction}
+module.exports = { addTransaction, updateTransaction, getTransactions, deleteTransaction }

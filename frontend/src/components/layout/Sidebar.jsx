@@ -9,8 +9,9 @@ import {
   ChevronRight,
   User,
   IndianRupee,
-  Award 
+  Award
 } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
 
 
 const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
@@ -18,9 +19,11 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
     { name: "Dashboard", path: "/", icon: <LayoutDashboard size={20} /> },
     { name: "Transactions", path: "/transactions", icon: <ArrowLeftRight size={20} /> },
     { name: "Bills", path: "/bills", icon: <FileText size={20} /> },
-    { name: "Payments", path: "/payments", icon: <IndianRupee size={20} />},
-    { name: "Clients", path: "/clients", icon: <Award size={20} />},
+    { name: "Payments", path: "/payments", icon: <IndianRupee size={20} /> },
+    { name: "Clients", path: "/clients", icon: <Award size={20} /> },
   ];
+
+  const { user, logout } = useAuth()
 
   return (
     <>
@@ -54,7 +57,7 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
             {!collapsed && (
               <div className="overflow-hidden transition-all duration-300">
                 <span className="text-xl font-bold bg-gradient-to-r from-white to-white/80 bg-clip-text text-transparent">
-                Asian Roadways
+                  Asian Roadways
                 </span>
                 <p className="text-[11px] text-white/40 font-medium tracking-wide">
                   Transport Company
@@ -85,10 +88,9 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
               className={({ isActive }) => `
                 relative group flex items-center gap-3 px-3 py-2.5 rounded-xl
                 transition-all duration-200 ease-out
-                ${
-                  isActive
-                    ? "bg-indigo-600/20 text-indigo-300 shadow-lg shadow-indigo-500/10"
-                    : "text-white/70 hover:text-white hover:bg-white/10"
+                ${isActive
+                  ? "bg-indigo-600/20 text-indigo-300 shadow-lg shadow-indigo-500/10"
+                  : "text-white/70 hover:text-white hover:bg-white/10"
                 }
                 ${collapsed ? "justify-center" : "justify-start"}
               `}
@@ -98,15 +100,15 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
               {({ isActive }) => isActive && (
                 <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-indigo-500 rounded-r-full shadow-lg shadow-indigo-500/50" />
               )}
-              
+
               <span className="transition-transform duration-200 group-hover:scale-105">
                 {item.icon}
               </span>
-              
+
               {!collapsed && (
                 <span className="text-sm font-medium tracking-wide">{item.name}</span>
               )}
-              
+
               {/* Tooltip for Collapsed Mode */}
               {collapsed && (
                 <div className="absolute left-full ml-3 px-2.5 py-1.5 bg-slate-800 text-white text-xs font-medium rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none whitespace-nowrap z-50 shadow-xl border border-white/10 backdrop-blur-sm">
@@ -130,15 +132,15 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
             </div>
             {!collapsed && (
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-white truncate">Alex Morgan</p>
-                <p className="text-xs text-white/40 truncate">Operations Manager</p>
+                <p className="text-sm font-semibold text-white truncate">{user.username} ({user.role})</p>
+                <p className="text-xs text-white/40 truncate">{user.branch}</p>
               </div>
             )}
-         
+
           </div>
 
           {/* Logout Button */}
-          <button className="relative group flex items-center gap-3 w-full px-3 py-2.5 rounded-xl transition-all duration-200 hover:bg-red-500/10 text-white/70 hover:text-red-400">
+          <button onClick={logout} className="relative group flex items-center gap-3 w-full px-3 py-2.5 rounded-xl transition-all duration-200 hover:bg-red-500/10 text-white/70 hover:text-red-400">
             <LogOut size={18} className="transition-transform duration-200 group-hover:translate-x-0.5" />
             {!collapsed && (
               <span className="text-sm font-medium">Logout</span>
@@ -153,7 +155,7 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
         </div>
       </div>
 
-      {/* Mobile Overlay - Improved with Blur */}
+
       {open && (
         <div
           className="fixed inset-0 bg-black/60 backdrop-blur-sm md:hidden animate-in fade-in duration-300 z-40"

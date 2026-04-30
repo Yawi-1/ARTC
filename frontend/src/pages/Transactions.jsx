@@ -4,11 +4,14 @@ import useApi from "../hooks/useApi";
 import TransactionFilters from "../components/Transactions/TransactionFilters";
 import TransactionTable from "../components/Transactions/TransactionTable";
 import TransactionModal from "../components/Transactions/TransactionModal ";
+import { useAuth } from '../context/AuthContext'
 
 const Transactions = () => {
   const { callApi, loading, error } = useApi();
+  
 
   const [data, setData] = useState([]);
+
   const [showModal, setShowModal] = useState(false);
 
   const [filters, setFilters] = useState({
@@ -18,9 +21,9 @@ const Transactions = () => {
   });
 
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 3;
 
-  // ✅ Fetch
+ 
   const fetchTransactions = async () => {
     const res = await callApi({ method: "GET", url: "/transactions" });
     setData(res.data);
@@ -30,7 +33,6 @@ const Transactions = () => {
     fetchTransactions();
   }, []);
 
-  // ✅ Filter logic
   const filteredData = data.filter((t) => {
     return (
       (filters.type === "all" || t.type === filters.type) &&
