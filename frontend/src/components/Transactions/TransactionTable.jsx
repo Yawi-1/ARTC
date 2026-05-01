@@ -21,7 +21,7 @@ const TransactionTable = ({
           </thead>
 
           <tbody>
-            {data.length > 0 ? (
+            {data?.length > 0 ? (
               data.map((t, i) => (
                 <tr key={t._id} className="hover:bg-gray-50">
                   <td className="px-2 py-1.5 border">{i + 1}</td>

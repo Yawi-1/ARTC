@@ -53,6 +53,7 @@ const getTransactions = asyncHandler(async (req, res) => {
 
     let filter = {};
 
+    // Branch filter
     if (req.user.role === 'Admin') {
         if (branch) filter.branch = branch;
     } else {
@@ -63,7 +64,7 @@ const getTransactions = asyncHandler(async (req, res) => {
     if (type) filter.type = type;
     if (category) filter.category = category;
 
-    // 📊 Fetch paginated data
+    // 📊 Paginated data
     const transactions = await Transaction.find(filter)
         .sort({ createdAt: -1 })
         .skip(skip)
@@ -72,30 +73,37 @@ const getTransactions = asyncHandler(async (req, res) => {
     // 📈 Total count
     const totalCount = await Transaction.countDocuments(filter);
 
-    // 💰 Total amount (aggregation)
-    const totalAmountResult = await Transaction.aggregate([
+    // 💰 Income & Expense totals
+    const totals = await Transaction.aggregate([
         { $match: filter },
         {
             $group: {
-                _id: null,
+                _id: "$type",
                 total: { $sum: "$amount" }
             }
         }
     ]);
 
-    const totalAmount = totalAmountResult[0]?.total || 0;
+    let totalIncome = 0;
+    let totalExpense = 0;
 
+    totals.forEach((item) => {
+        if (item._id === "income") totalIncome = item.total;
+        if (item._id === "expense") totalExpense = item.total;
+    });
+
+    // ✅ Final response
     res.json({
         success: true,
         page,
         limit,
         totalCount,
         totalPages: Math.ceil(totalCount / limit),
-        totalAmount,
+        totalIncome,
+        totalExpense,
         data: transactions
     });
 });
-
 const deleteTransaction = asyncHandler(async (req, res) => {
     const { id } = req.params;
 
