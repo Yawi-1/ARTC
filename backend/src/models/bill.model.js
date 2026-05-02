@@ -14,7 +14,7 @@ const billSchema = new mongoose.Schema({
         index: true
     },
     billMonth: {
-        type: String, // better: YYYY-MM format
+        type: String, 
         required: true,
         index: true
     },

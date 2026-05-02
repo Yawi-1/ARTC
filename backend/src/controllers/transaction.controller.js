@@ -44,7 +44,7 @@ const updateTransaction = asyncHandler(async (req, res) => {
     });
 });
 const getTransactions = asyncHandler(async (req, res) => {
-    let { page = 1, limit = 2, branch, type, category } = req.query;
+    let { page = 1, limit = 10, branch, type, category } = req.query;
 
     page = parseInt(page);
     limit = parseInt(limit);
