@@ -20,7 +20,7 @@ const clientSchema = new mongoose.Schema({
         index: true
     },
     branch: {
-        type: mongoose.Schema.Types.ObjectId, // ✅ better than string
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Branch',
         required: true
     }

@@ -1,10 +1,12 @@
 const mongoose = require('mongoose')
 
 const branchSchema = new mongoose.Schema({
-    branchName: {
+    name: {
         type: String,
         required: true,
-        trim: true
+        trim: true,
+        lowerCase: true,
+        unique: true
     },
     address: String,
     contact: String
