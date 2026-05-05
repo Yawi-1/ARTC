@@ -15,7 +15,6 @@ export const AuthProvider = ({ children }) => {
     try {
       setAuthLoading(true);
       const res = await axiosInstance.post("/auth/login", data);
-
       setUser(res.data.data);
       alert(res.data.message)
       navigate("/");
@@ -37,6 +36,16 @@ export const AuthProvider = ({ children }) => {
 
   }, [])
 
+  const branches = async (req, res) => {
+    try {
+      const res = await axiosInstance.get('/branch')
+      console.log(res)
+    } catch (error) {
+      console.log(error)
+
+    }
+  }
+
 
   const fetchUser = useCallback(async () => {
     setAuthLoading(true)
@@ -52,6 +61,7 @@ export const AuthProvider = ({ children }) => {
 
 
   useEffect(() => {
+    branches()
     if (!user) {
       fetchUser();
     } else {
