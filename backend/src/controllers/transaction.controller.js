@@ -65,7 +65,7 @@ const getTransactions = asyncHandler(async (req, res) => {
     if (category) filter.category = category;
 
     // 📊 Paginated data
-    const transactions = await Transaction.find(filter)
+    const transactions = await Transaction.find(filter).populate('branch')
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit);

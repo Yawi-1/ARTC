@@ -2,17 +2,18 @@ import { useState } from "react";
 import useApi from "../../hooks/useApi";
 import { branches } from "../../data/branches";
 import { useAuth } from "../../context/AuthContext";
-
+import { useBranch } from "../../context/BranchContext";
 const TransactionModal = ({ onClose, onSuccess }) => {
   const { callApi } = useApi();
   const { user } = useAuth()
   const { id, branch, role } = user;
+  const {branches} = useBranch()
 
   const [form, setForm] = useState({
     type: "income",
     amount: "",
     category: "",
-    branch: branch || "",
+    branch: "",
     remark: "",
   });
 
@@ -88,13 +89,13 @@ const TransactionModal = ({ onClose, onSuccess }) => {
               className="w-full border border-gray-300 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 p-2 rounded-md text-sm"
             >
               {branches.map((b) => (
-                <option key={b} value={b}>
-                  {b}
+                <option key={b._id} value={b._id}>
+                  {b.name}
                 </option>
               ))}
             </select>) : (
               <div className="flex items-center gap-4 w-full border bg-gray-400 border-gray-300 p-2 rounded-md">
-                 <p className="w-1/5">Branch : </p>
+                <p className="w-1/5">Branch : </p>
                 <input className="" type="text" name="" value={branch} id="" readOnly />
               </div>
             )

@@ -4,6 +4,7 @@ const TransactionTable = ({
   setCurrentPage,
   totalPages,
 }) => {
+  console.log(data)
   return (
     <>
       <div className="overflow-x-auto bg-white rounded-lg border">
@@ -51,7 +52,7 @@ const TransactionTable = ({
                   </td>
 
                   <td className="px-2 py-1.5 border">
-                    {t.branch}
+                    {t.branch.name}
                   </td>
                 </tr>
               ))

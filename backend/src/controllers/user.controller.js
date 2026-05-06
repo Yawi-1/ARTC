@@ -9,7 +9,7 @@ const generateToken = (user) => {
   return jwt.sign(
     {
       id: user.id,
-      branch: user.branch, // ✅ always ObjectId
+      branch: user.branch, 
       role: user.role
     },
     process.env.JWT_SECRET,
@@ -17,7 +17,6 @@ const generateToken = (user) => {
   );
 };
 
-// ================= SIGNUP =================
 const signup = asyncHandler(async (req, res) => {
   const { username, password, role, branch } = req.body;
 
@@ -36,15 +35,14 @@ const signup = asyncHandler(async (req, res) => {
     username,
     password: hashedPassword,
     role,
-    branch // ✅ should be ObjectId
+    branch 
   });
 
-  // populate branch name
   const populatedUser = await user.populate('branch', 'name');
 
   const token = generateToken({
     id: user._id,
-    branch: user.branch, // ObjectId
+    branch: user.branch._id, 
     role: user.role
   });
 
@@ -66,7 +64,6 @@ const signup = asyncHandler(async (req, res) => {
   });
 });
 
-// ================= LOGIN =================
 const login = asyncHandler(async (req, res) => {
   const { username, password } = req.body;
 
@@ -87,7 +84,7 @@ const login = asyncHandler(async (req, res) => {
 
   const token = generateToken({
     id: user._id,
-    branch: user.branch._id, // ✅ FIXED
+    branch: user.branch._id, 
     role: user.role
   });
 
@@ -109,7 +106,6 @@ const login = asyncHandler(async (req, res) => {
   });
 });
 
-// ================= LOGOUT =================
 const logout = asyncHandler(async (req, res) => {
   res.clearCookie('token', {
     httpOnly: true,
@@ -123,7 +119,6 @@ const logout = asyncHandler(async (req, res) => {
   });
 });
 
-// ================= GET ME =================
 const getMe = asyncHandler(async (req, res) => {
   const { id } = req.user;
 

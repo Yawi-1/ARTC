@@ -2,9 +2,8 @@ const mongoose = require('mongoose')
 
 const transactionSchema = new mongoose.Schema({
     branch: {
-        type: String,
-        required: true,
-        index: true
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Branch'
     },
     type: {
         type: String,

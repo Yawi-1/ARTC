@@ -36,17 +36,6 @@ export const AuthProvider = ({ children }) => {
 
   }, [])
 
-  const branches = async (req, res) => {
-    try {
-      const res = await axiosInstance.get('/branch')
-      console.log(res)
-    } catch (error) {
-      console.log(error)
-
-    }
-  }
-
-
   const fetchUser = useCallback(async () => {
     setAuthLoading(true)
     try {
@@ -61,13 +50,12 @@ export const AuthProvider = ({ children }) => {
 
 
   useEffect(() => {
-    branches()
     if (!user) {
       fetchUser();
     } else {
       setAuthLoading(false);
     }
-  }, []); // 🔥 no dependency
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, login, authLoading, logout }}>
