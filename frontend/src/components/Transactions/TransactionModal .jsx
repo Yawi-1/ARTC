@@ -1,24 +1,28 @@
 import { useState } from "react";
 import useApi from "../../hooks/useApi";
-import { branches } from "../../data/branches";
 import { useAuth } from "../../context/AuthContext";
 import { useBranch } from "../../context/BranchContext";
+
 const TransactionModal = ({ onClose, onSuccess }) => {
   const { callApi } = useApi();
-  const { user } = useAuth()
-  const { id, branch, role } = user;
-  const {branches} = useBranch()
+  const { user } = useAuth();
+  const { branches } = useBranch();
+
+  const { branch: userBranch, role } = user;
+  console.log('User data ',user)
 
   const [form, setForm] = useState({
     type: "income",
     amount: "",
     category: "",
-    branch: "",
+    branch: role === "Admin" ? "" : userBranch,
+    date: "",
     remark: "",
   });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
       const res = await callApi({
         method: "POST",
@@ -28,7 +32,7 @@ const TransactionModal = ({ onClose, onSuccess }) => {
           amount: Number(form.amount),
         },
       });
-      console.log(res.data)
+
       onSuccess(res.data || res);
       onClose();
     } catch (err) {
@@ -36,105 +40,175 @@ const TransactionModal = ({ onClose, onSuccess }) => {
     }
   };
 
+  // Find current branch name
+  const currentBranch = branches.find(
+    (b) => b._id === userBranch._id
+  );
+
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50 px-3">
+      <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl p-5">
 
-      <div className="bg-white w-full max-w-md rounded-xl shadow-lg p-5">
+        {/* Header */}
+        <div className="mb-5">
+          <h2 className="text-xl font-bold text-gray-800">
+            Add Transaction
+          </h2>
+          <p className="text-sm text-gray-500">
+            Fill transaction details below
+          </p>
+        </div>
 
-        <h2 className="text-lg font-semibold mb-4 text-gray-700">
-          Add Transaction
-        </h2>
-
-        <form onSubmit={handleSubmit} className="space-y-3">
+        <form onSubmit={handleSubmit} className="space-y-4">
 
           {/* Type */}
-          <select
-            value={form.type}
-            onChange={(e) =>
-              setForm({ ...form, type: e.target.value })
-            }
-            className="w-full border border-gray-300 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 p-2 rounded-md text-sm"
-          >
-            <option value="income">Income</option>
-            <option value="expense">Expense</option>
-          </select>
+          <div>
+            <label className="block text-sm font-medium text-gray-600 mb-1">
+              Type
+            </label>
+
+            <select
+              value={form.type}
+              onChange={(e) =>
+                setForm({ ...form, type: e.target.value })
+              }
+              className="w-full border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none p-2.5 rounded-lg text-sm transition"
+            >
+              <option value="income">Income</option>
+              <option value="expense">Expense</option>
+            </select>
+          </div>
 
           {/* Amount */}
-          <input
-            type="number"
-            placeholder="Amount"
-            value={form.amount}
-            onChange={(e) =>
-              setForm({ ...form, amount: e.target.value })
-            }
-            className="w-full border border-gray-300 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 p-2 rounded-md text-sm"
-          />
+          <div>
+            <label className="block text-sm font-medium text-gray-600 mb-1">
+              Amount
+            </label>
+
+            <input
+              type="number"
+              placeholder="Enter amount"
+              value={form.amount}
+              onChange={(e) =>
+                setForm({ ...form, amount: e.target.value })
+              }
+              className="w-full border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none p-2.5 rounded-lg text-sm transition"
+            />
+          </div>
 
           {/* Category */}
-          <input
-            type="text"
-            placeholder="Category"
-            value={form.category}
-            onChange={(e) =>
-              setForm({ ...form, category: e.target.value })
-            }
-            className="w-full border border-gray-300 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 p-2 rounded-md text-sm"
-          />
-          {
-            role === 'Admin' ? (<select
-              value={form.branch}
-              onChange={(e) =>
-                setForm({ ...form, branch: e.target.value })
-              }
-              className="w-full border border-gray-300 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 p-2 rounded-md text-sm"
-            >
-              {branches.map((b) => (
-                <option key={b._id} value={b._id}>
-                  {b.name}
-                </option>
-              ))}
-            </select>) : (
-              <div className="flex items-center gap-4 w-full border bg-gray-400 border-gray-300 p-2 rounded-md">
-                <p className="w-1/5">Branch : </p>
-                <input className="" type="text" name="" value={branch} id="" readOnly />
-              </div>
-            )
-          }
+          <div>
+            <label className="block text-sm font-medium text-gray-600 mb-1">
+              Category
+            </label>
 
+            <input
+              type="text"
+              placeholder="Enter category"
+              value={form.category}
+              onChange={(e) =>
+                setForm({ ...form, category: e.target.value })
+              }
+              className="w-full border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none p-2.5 rounded-lg text-sm transition"
+            />
+          </div>
+
+          {/* Branch */}
+          <div>
+            <label className="block text-sm font-medium text-gray-600 mb-1">
+              Branch
+            </label>
+
+            {role === "Admin" ? (
+              <select
+                value={form.branch}
+                onChange={(e) =>
+                  setForm({ ...form, branch: e.target.value })
+                }
+                className="w-full border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none p-2.5 rounded-lg text-sm transition"
+                required
+              >
+                <option value="">Select Branch</option>
+
+                {branches.map((b) => (
+                  <option key={b._id} value={b._id}>
+                    {b.name}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input
+                type="text"
+                value={currentBranch?.name || ""}
+                readOnly
+                className="
+                  w-full
+                  rounded-lg
+                  border border-indigo-200
+                  bg-indigo-50
+                  px-3 py-2.5
+                  text-sm
+                  font-medium
+                  text-gray-700
+                  shadow-sm
+                  cursor-not-allowed
+                  focus:outline-none
+                "
+              />
+            )}
+          </div>
 
           {/* Date */}
-          <input
-            type="date"
-            value={form.date}
-            onChange={(e) =>
-              setForm({ ...form, date: e.target.value })
-            }
-            className="w-full border border-gray-300 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 p-2 rounded-md text-sm"
-          />
+          <div>
+            <label className="block text-sm font-medium text-gray-600 mb-1">
+              Date
+            </label>
+
+            <input
+              type="date"
+              value={form.date}
+              onChange={(e) =>
+                setForm({ ...form, date: e.target.value })
+              }
+              className="w-full border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none p-2.5 rounded-lg text-sm transition"
+            />
+          </div>
 
           {/* Remark */}
-          <input
-            type="text"
-            placeholder="Remark"
-            value={form.remark}
-            onChange={(e) =>
-              setForm({ ...form, remark: e.target.value })
-            }
-            className="w-full border border-gray-300 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 p-2 rounded-md text-sm"
-          />
+          <div>
+            <label className="block text-sm font-medium text-gray-600 mb-1">
+              Remark
+            </label>
+
+            <input
+              type="text"
+              placeholder="Enter remark"
+              value={form.remark}
+              onChange={(e) =>
+                setForm({ ...form, remark: e.target.value })
+              }
+              className="w-full border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none p-2.5 rounded-lg text-sm transition"
+            />
+          </div>
 
           {/* Buttons */}
-          <div className="flex justify-end gap-2 pt-2">
+          <div className="flex justify-end gap-3 pt-2">
+
             <button
               type="button"
               onClick={onClose}
-              className="px-3 py-1 text-sm border rounded-md hover:bg-gray-100"
+              className="px-4 py-2 rounded-lg border border-gray-300 text-sm font-medium hover:bg-gray-100 transition"
             >
               Cancel
             </button>
-            <button className="px-3 py-1 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
-              Save
+
+            <button
+              type="submit"
+              className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium shadow-md transition"
+            >
+              Save Transaction
             </button>
+
           </div>
 
         </form>

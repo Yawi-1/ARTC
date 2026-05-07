@@ -71,7 +71,7 @@ export default function LoginPage() {
                 Username
               </label>
               <div className={`relative flex items-center rounded-xl border-2 transition-all duration-200 bg-slate-50 ${focusedField === "username" ? "border-blue-500 bg-white ring-4 ring-blue-50" : "border-transparent hover:border-slate-200"}`}>
-                <User2 className={`absolute left-3.5 w-4 h-4 transition-colors duration-200 ${focusedField === "username" ? "text-blue-500" : "text-slate-400"}`} />
+                <User2 className={`absolute left-3.5 w-4 h-4 transition-colors  duration-200 ${focusedField === "username" ? "text-blue-500" : "text-slate-400"}`} />
                 <input
                   type="text"
                   value={username}
@@ -79,7 +79,7 @@ export default function LoginPage() {
                   onFocus={() => setFocusedField("username")}
                   onBlur={() => setFocusedField(null)}
                   placeholder="ARTC"
-                  className="w-full pl-10 pr-4 py-3 rounded-xl bg-transparent text-slate-800 placeholder:text-slate-300 text-sm outline-none"
+                  className="w-full pl-10 pr-4 py-3  rounded-xl bg-transparent text-slate-800 placeholder:text-slate-300 text-sm outline-none"
                 />
               </div>
             </div>

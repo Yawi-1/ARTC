@@ -133,7 +133,7 @@ const Sidebar = ({ open, setOpen, collapsed, setCollapsed }) => {
             {!collapsed && (
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-white truncate">{user.username} ({user.role})</p>
-                <p className="text-xs text-white/40 truncate">{user.branch}</p>
+                <p className="text-xs text-white/40 truncate">{user.branch.name}</p>
               </div>
             )}
 

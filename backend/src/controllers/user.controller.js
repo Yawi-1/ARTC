@@ -101,7 +101,7 @@ const login = asyncHandler(async (req, res) => {
       id: user._id,
       username: user.username,
       role: user.role,
-      branch: user.branch.name
+      branch: user.branch
     }
   });
 });
@@ -133,7 +133,7 @@ const getMe = asyncHandler(async (req, res) => {
       id: user._id,
       username: user.username,
       role: user.role,
-      branch: user.branch.name
+      branch: user.branch
     }
   });
 });

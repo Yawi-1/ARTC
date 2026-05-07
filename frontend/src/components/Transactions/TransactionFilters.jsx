@@ -1,7 +1,8 @@
-import { branches } from "../../data/branches";
 import { exportStyledExcel } from '../../utils/exportExcel'
+import { useBranch } from '../../context/BranchContext'
 const TransactionFilters = ({ data, filters, setFilters, setCurrentPage }) => {
   const categories = [...new Set(data.map(d => d.category))]
+  const { branches } = useBranch()
 
   return (
     <div className="flex gap-2 flex-wrap">
@@ -29,7 +30,7 @@ const TransactionFilters = ({ data, filters, setFilters, setCurrentPage }) => {
       >
         <option value="all">All Branches</option>
         {branches.map((b) => (
-          <option key={b}>{b}</option>
+          <option key={b} value={b._id}>{b.name}</option>
         ))}
       </select>
 
