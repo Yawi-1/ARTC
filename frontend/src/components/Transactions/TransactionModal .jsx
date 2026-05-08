@@ -9,10 +9,9 @@ const TransactionModal = ({ onClose, onSuccess }) => {
   const { branches } = useBranch();
 
   const { branch: userBranch, role } = user;
-  console.log('User data ',user)
 
   const [form, setForm] = useState({
-    type: "income",
+    type: "expense",
     amount: "",
     category: "",
     branch: role === "Admin" ? "" : userBranch,
@@ -32,8 +31,9 @@ const TransactionModal = ({ onClose, onSuccess }) => {
           amount: Number(form.amount),
         },
       });
+      console.log(res.data)
 
-      onSuccess(res.data || res);
+      onSuccess(res.data);
       onClose();
     } catch (err) {
       console.log(err);
@@ -95,8 +95,6 @@ const TransactionModal = ({ onClose, onSuccess }) => {
               className="w-full border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none p-2.5 rounded-lg text-sm transition"
             />
           </div>
-
-          {/* Category */}
           <div>
             <label className="block text-sm font-medium text-gray-600 mb-1">
               Category

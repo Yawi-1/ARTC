@@ -1,21 +1,23 @@
 const Transaction = require('../models/transactions.model');
 const ApiError = require('../utils/ApiError');
 const asyncHandler = require('../utils/asynHandler')
+const mongoose = require('mongoose');
 
 const addTransaction = asyncHandler(async (req, res) => {
     let branch;
     if (req.user.role === "Admin") {
-        branch = req.body.branch || req.user.branch; 
+        branch = req.body.branch || req.user.branch;
     } else {
         branch = req.user.branch;
     }
-    const { type, amount, category, remarks } = req.body;
+    const { type, amount, category, remarks, date } = req.body;
     if (!type || !amount || !category) {
         throw new ApiError('All fields are required', 400)
     }
 
-    const transaction = new Transaction({ branch, type, amount, category, remarks })
+    const transaction = new Transaction({ branch, type, amount, category, remarks, date })
     await transaction.save()
+    await transaction.populate('branch', 'name');
 
     res.json({ message: 'New transaction added', data: transaction })
 })
@@ -51,21 +53,22 @@ const getTransactions = asyncHandler(async (req, res) => {
 
     const skip = (page - 1) * limit;
 
+
     let filter = {};
 
-    // Branch filter
     if (req.user.role === 'Admin') {
-        if (branch) filter.branch = branch;
+        if (branch) {
+            filter.branch = new mongoose.Types.ObjectId(branch);
+        }
     } else {
-        filter.branch = req.user.branch;
+        filter.branch = new mongoose.Types.ObjectId(req.user.branch);
     }
 
-    // Optional filters
     if (type) filter.type = type;
     if (category) filter.category = category;
 
     // 📊 Paginated data
-    const transactions = await Transaction.find(filter).populate('branch')
+    const transactions = await Transaction.find(filter).populate('branch', 'name')
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit);
@@ -92,7 +95,6 @@ const getTransactions = asyncHandler(async (req, res) => {
         if (item._id === "expense") totalExpense = item.total;
     });
 
-    // ✅ Final response
     res.json({
         success: true,
         page,

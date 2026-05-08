@@ -38,7 +38,7 @@ const Transactions = () => {
       method: "GET",
       url: `/transactions?${query}`,
     });
-    console.log(res)
+    console.log('Fetch Response ',res)
     setData(res.data);
     setTotalExpense(res.totalExpense);
     setTotalIncome(res.totalIncome);

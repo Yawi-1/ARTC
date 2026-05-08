@@ -4,7 +4,6 @@ const TransactionTable = ({
   setCurrentPage,
   totalPages,
 }) => {
-  console.log(data)
   return (
     <>
       <div className="overflow-x-auto bg-white rounded-lg border">
@@ -28,7 +27,7 @@ const TransactionTable = ({
                   <td className="px-2 py-1.5 border">{i + 1}</td>
 
                   <td className="px-2 py-1.5 border">
-                    {new Date(t.createdAt).toLocaleDateString()}
+                    {new Date(t.date).toLocaleDateString()}
                   </td>
 
                   <td className="px-2 py-1.5 border">
