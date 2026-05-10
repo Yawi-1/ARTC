@@ -5,13 +5,19 @@ import App from './App.jsx'
 import { BrowserRouter } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext.jsx'
 import { BranchProvider } from './context/BranchContext.jsx'
+import { TransactionProvider } from './context/TransactionContext.jsx'
+import { ClientProvider } from './context/ClientContext.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
       <AuthProvider>
         <BranchProvider>
-          <App />
+          <TransactionProvider>
+            <ClientProvider>
+              <App />
+            </ClientProvider>
+          </TransactionProvider>
         </BranchProvider>
       </AuthProvider>
     </BrowserRouter>

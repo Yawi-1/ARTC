@@ -20,7 +20,6 @@ const transactionSchema = new mongoose.Schema({
     category: {
         type: String,
         required: true,
-        unique: true,
         lowercase:true
     },
     remarks: String,

@@ -11,6 +11,7 @@ const PORT = process.env.PORT || 5000;
 const userRoutes = require('./src/routes/user.routes')
 const transactionRoutes = require('./src/routes/transaction.routes')
 const branchRoutes = require('./src/routes/branch.routes')
+const clientRoutes = require('./src/routes/client.routes')
 
 // Middlewares
 app.use(express.json())
@@ -23,6 +24,7 @@ app.use(cors({
 app.use('/api/auth', userRoutes)
 app.use('/api/branch', branchRoutes)
 app.use('/api/transactions', transactionRoutes)
+app.use('/api/clients', clientRoutes)
 app.get('/', (req, res) => { res.send('<h1>Hello from server</h1>') })
 
 // Error Handler 

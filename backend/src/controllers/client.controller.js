@@ -3,27 +3,21 @@ const asyncHandler = require('../utils/asynHandler')
 const ApiError = require('../utils/ApiError');
 
 const addClient = asyncHandler(async (req, res) => {
-    const { name, address, contact, email, clientCode, branch } = req.body;
+    const { name, address, contact, email, branch } = req.body;
 
-    let clientBranch = req.user.branch;
 
-    if (req.user.role === 'Admin') {
-        clientBranch = branch || req.user.branch;
+    if (!name || !email) {
+        throw new ApiError('Client name and email is required');
     }
-
-    if (!name || !clientCode) {
-        throw new ApiError('Client name and code is required');
-    }
-
     try {
-        const client = await Client.create({
+        let client = await Client.create({
             name,
             address,
             contact,
             email,
-            clientCode,
-            branch: clientBranch   
+            branch
         });
+        client = await client.populate("branch", "name");
 
         res.status(201).json({
             success: true,
@@ -31,9 +25,6 @@ const addClient = asyncHandler(async (req, res) => {
         });
 
     } catch (error) {
-        if (error.code === 11000) {
-            throw new ApiError('Client code already exists');
-        }
         throw error;
     }
 });
@@ -47,17 +38,8 @@ const getClients = asyncHandler(async (req, res) => {
     const skip = (page - 1) * limit;
 
     let filter = {};
-
-    // ✅ Role-based filter
-    if (req.user.role !== 'Admin') {
-        filter.branch = req.user.branch;
-    } else if (branch) {
-        filter.branch = branch;
-    }
-
-    if (name) {
-        filter.name = { $regex: name, $options: 'i' };
-    }
+    if (branch) filter.branch = branch
+    if (name) filter.name = name
 
     const clients = await Client.find(filter)
         .limit(limit)
@@ -129,3 +111,5 @@ const deleteClient = asyncHandler(async (req, res) => {
         message: 'Client deleted successfully'
     });
 });
+
+module.exports = { addClient, deleteClient, getClients, updateClient }

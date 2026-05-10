@@ -13,12 +13,6 @@ const clientSchema = new mongoose.Schema({
         lowercase: true,
         trim: true
     },
-    clientCode: {
-        type: String,
-        required: true,
-        unique: true,
-        index: true
-    },
     branch: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Branch',
