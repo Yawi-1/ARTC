@@ -31,8 +31,6 @@ const TransactionModal = ({ onClose, onSuccess }) => {
           amount: Number(form.amount),
         },
       });
-      console.log(res.data)
-
       onSuccess(res.data);
       onClose();
     } catch (err) {

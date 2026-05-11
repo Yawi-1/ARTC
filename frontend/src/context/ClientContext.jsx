@@ -13,7 +13,6 @@ export const ClientProvider = ({ children }) => {
             method: 'GET',
             url: '/clients'
         })
-        console.log(res)
         setClients(res.data)
     }
 
@@ -21,7 +20,7 @@ export const ClientProvider = ({ children }) => {
         fetchClients()
     }, [])
 
-    return (<ClientContext.Provider value={{ clients}}>
+    return (<ClientContext.Provider value={{ clients,setClients}}>
         {children}
     </ClientContext.Provider>)
 }

@@ -6,7 +6,7 @@ const addClient = asyncHandler(async (req, res) => {
     const { name, address, contact, email, branch } = req.body;
 
 
-    if (!name || !email) {
+    if (!name || !email || !branch) {
         throw new ApiError('Client name and email is required');
     }
     try {
@@ -16,7 +16,7 @@ const addClient = asyncHandler(async (req, res) => {
             contact,
             email,
             branch
-        });
+        })
         client = await client.populate("branch", "name");
 
         res.status(201).json({
@@ -41,7 +41,7 @@ const getClients = asyncHandler(async (req, res) => {
     if (branch) filter.branch = branch
     if (name) filter.name = name
 
-    const clients = await Client.find(filter)
+    const clients = await Client.find(filter).populate('branch','name')
         .limit(limit)
         .skip(skip)
         .sort({ createdAt: -1 });
