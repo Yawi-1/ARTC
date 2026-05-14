@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useClient } from "../context/ClientContext";
 import useApi from "../hooks/useApi";
 import { useBranch } from "../context/BranchContext";
+import { useAuth } from '../context/AuthContext'
 
 import {
   User,
@@ -19,7 +20,7 @@ const Clients = () => {
   const { clients, setClients } = useClient();
   const { callApi, loading } = useApi();
   const { branches } = useBranch();
-
+  const { user } = useAuth()
   const [form, setForm] = useState({
     name: "",
     address: "",
@@ -83,14 +84,15 @@ const Clients = () => {
 
   // Update Client
   const handleUpdate = async (id) => {
+    if (!editForm.branch) {
+      return alert('Please select the branch')
+    }
     try {
       const res = await callApi({
         method: "PUT",
         url: `/clients/${id}`,
         data: editForm,
       });
-
-      console.log(res)
 
       if (res?.data) {
         setClients((prev) =>
@@ -142,7 +144,6 @@ const Clients = () => {
           onSubmit={handleSubmit}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
         >
-          {/* Name */}
           <div>
             <label className="text-sm font-medium text-gray-600 mb-1 block">
               Client Name
@@ -280,34 +281,37 @@ const Clients = () => {
               <div className="w-14 h-14 rounded-2xl bg-indigo-100 flex items-center justify-center text-indigo-700 text-xl font-bold">
                 {c?.name?.charAt(0)?.toUpperCase()}
               </div>
+              {(user?.branch?.name === c.branch.name || user?.role === 'Admin') && <div>
+                {editingId === c._id ? (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleUpdate(c._id)}
+                      className="bg-green-500 hover:bg-green-600 text-white p-2 rounded-xl"
+                    >
+                      <Save size={16} />
+                    </button>
 
-              {editingId === c._id ? (
-                <div className="flex gap-2">
+                    <button
+                      onClick={() => setEditingId(null)}
+                      className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-xl"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                ) : (
                   <button
-                    onClick={() => handleUpdate(c._id)}
-                    className="bg-green-500 hover:bg-green-600 text-white p-2 rounded-xl"
+                    onClick={() => handleEdit(c)}
+                    className="bg-indigo-100 hover:bg-indigo-200 text-indigo-600 p-2 rounded-xl"
                   >
-                    <Save size={16} />
+                    <Pencil size={16} />
                   </button>
+                )}
+              </div>}
 
-                  <button
-                    onClick={() => setEditingId(null)}
-                    className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-xl"
-                  >
-                    <X size={16} />
-                  </button>
-                </div>
-              ) : (
-                <button
-                  onClick={() => handleEdit(c)}
-                  className="bg-indigo-100 hover:bg-indigo-200 text-indigo-600 p-2 rounded-xl"
-                >
-                  <Pencil size={16} />
-                </button>
-              )}
+
             </div>
 
-            {/* Edit Mode */}
+
             {editingId === c._id ? (
               <div className="space-y-3 mt-5">
                 <input

@@ -28,7 +28,6 @@ const addClient = asyncHandler(async (req, res) => {
         throw error;
     }
 });
-
 const getClients = asyncHandler(async (req, res) => {
     let { limit = 10, page = 1, branch, name } = req.query;
 
@@ -56,7 +55,6 @@ const getClients = asyncHandler(async (req, res) => {
         data: clients
     });
 });
-
 const updateClient = asyncHandler(async (req, res) => {
     const { id } = req.params;
     const { name, address, contact, email, branch } = req.body;
@@ -77,13 +75,14 @@ const updateClient = asyncHandler(async (req, res) => {
         client.branch = branch;
     }
 
-    // ✅ Update fields
     if (name) client.name = name;
     if (address) client.address = address;
     if (contact) client.contact = contact;
     if (email) client.email = email;
+    if (branch) client.branch = branch;
 
     await client.save();
+    await client.populate('branch','name')
 
     res.status(200).json({
         success: true,
