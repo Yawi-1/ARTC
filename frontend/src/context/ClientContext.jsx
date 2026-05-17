@@ -1,28 +1,76 @@
-import { useContext, useEffect, createContext, useState } from "react";
-import axiosInstance from "../utils/axiosInstance";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+  useMemo,
+} from "react";
+
 import useApi from "../hooks/useApi";
 
-const ClientContext = createContext()
+const ClientContext = createContext(null);
 
 export const ClientProvider = ({ children }) => {
-    const [clients, setClients] = useState([])
-    const { callApi, loading, error } = useApi()
 
-    const fetchClients = async () => {
-        const res = await callApi({
-            method: 'GET',
-            url: '/clients'
-        })
-        setClients(res.data)
+  const [clients, setClients] = useState([]);
+
+  const {
+    callApi,
+    loading,
+    error,
+  } = useApi();
+
+  // Fetch Clients
+  const fetchClients = useCallback(async () => {
+
+    try {
+
+      const res = await callApi({
+        method: "GET",
+        url: "/clients",
+      });
+
+      if (!res) return;
+
+      setClients(res.data || []);
+
+    } catch (err) {
+      console.log(err);
     }
 
-    useEffect(() => {
-        fetchClients()
-    }, [])
+  }, [callApi]);
 
-    return (<ClientContext.Provider value={{ clients,setClients}}>
-        {children}
-    </ClientContext.Provider>)
-}
 
-export const useClient = () => useContext(ClientContext)
+
+  // Initial Fetch
+  useEffect(() => {
+    fetchClients();
+  }, []);
+
+
+
+  // Memoized Value
+  const value = useMemo(() => ({
+    clients,
+    setClients,
+    loading,
+    error,
+    fetchClients,
+  }), [
+    clients,
+    loading,
+    error,
+    fetchClients,
+  ]);
+
+
+  return (
+    <ClientContext.Provider value={value}>
+      {children}
+    </ClientContext.Provider>
+  );
+};
+
+export const useClient = () =>
+  useContext(ClientContext);

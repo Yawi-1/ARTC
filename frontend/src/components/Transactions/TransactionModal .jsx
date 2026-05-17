@@ -34,7 +34,7 @@ const TransactionModal = ({ onClose, onSuccess }) => {
       onSuccess(res.data);
       onClose();
     } catch (err) {
-      console.log(err);
+      console.log(err.response.data.message);
     }
   };
 

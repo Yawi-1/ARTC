@@ -1,6 +1,6 @@
 import React from "react";
 import { transactions } from "../data/transactions";
-import { branches } from "../data/branches";
+import { useBranch } from "../context/BranchContext";
 import { calculateTotals } from "../utils/calculations";
 
 
@@ -40,6 +40,7 @@ const StatCard = ({ label, value }) => {
 };
 
 const Dashboard = () => {
+  const { branches } = useBranch()
   const overall = calculateTotals(transactions);
 
   const recentTransactions = [...transactions]
@@ -62,7 +63,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-     
+
       <div>
         <h2 className="text-lg font-semibold text-gray-700 mb-4">Overall Summary</h2>
         <Card
@@ -73,7 +74,7 @@ const Dashboard = () => {
         />
       </div>
 
-     
+
       <div>
         <h2 className="text-lg font-semibold text-gray-700 mb-4">Branch Performance</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -81,8 +82,8 @@ const Dashboard = () => {
             const data = calculateTotals(transactions, branch);
             return (
               <Card
-                key={branch}
-                title={branch}
+                key={branch._id}
+                title={branch.name}
                 income={data.income}
                 expense={data.expense}
                 profit={data.profit}
@@ -116,11 +117,10 @@ const Dashboard = () => {
                   <tr key={t.id} className="border-b border-gray-50 hover:bg-gray-50/50 transition-colors duration-100">
                     <td className="p-4 text-gray-700">{t.date}</td>
                     <td className="p-4">
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        t.type === "income"
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${t.type === "income"
                           ? "bg-emerald-50 text-emerald-700"
                           : "bg-rose-50 text-rose-700"
-                      }`}>
+                        }`}>
                         {t.type}
                       </span>
                     </td>
