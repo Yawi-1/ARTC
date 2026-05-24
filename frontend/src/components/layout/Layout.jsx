@@ -2,14 +2,16 @@ import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import { Menu } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
 
 const Layout = () => {
   const [open, setOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
+  const { user } = useAuth()
 
   return (
     <div className="flex h-screen bg-gray-50">
-      
+
       <Sidebar
         open={open}
         setOpen={setOpen}
@@ -19,10 +21,10 @@ const Layout = () => {
 
       {/* Main */}
       <div className="flex-1 flex flex-col">
-        
+
         {/* Topbar */}
         <div className="flex items-center justify-between bg-white px-4 py-3 shadow-sm border-b">
-          
+
           <button
             className="md:hidden"
             onClick={() => setOpen(true)}
@@ -31,11 +33,11 @@ const Layout = () => {
           </button>
 
           <h1 className="text-lg font-semibold text-gray-700">
-            Transport Manager
+            ARTC Expense Management
           </h1>
 
           <div className="text-sm text-gray-500">
-            Admin
+           {user?.role  || ''} {((user.branch.name))}
           </div>
         </div>
 
