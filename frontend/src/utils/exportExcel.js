@@ -74,7 +74,7 @@ export const exportStyledExcel = async (data) => {
       t.type,
       t.amount,
       t.category,
-      t.branch,
+      t.branch.name,
       t.remark || "",
     ]);
 

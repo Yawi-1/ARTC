@@ -3,7 +3,6 @@ import {
   useState,
   useEffect,
   useContext,
-  useCallback,
   useMemo,
 } from "react";
 
@@ -32,9 +31,9 @@ export const TransactionProvider = ({ children }) => {
     totalExpense: 0,
   });
 
-  const itemsPerPage = 20;
+  const [itemsPerPage, setItemsPerPage] = useState(5);
 
-  const fetchTransactions = useCallback(async () => {
+  const fetchTransactions = async () => {
 
     const query = new URLSearchParams({
       page: currentPage,
@@ -70,18 +69,20 @@ export const TransactionProvider = ({ children }) => {
       totalExpense: res.totalExpense,
     });
 
-  }, [currentPage, filters, callApi]);
+  };
 
-
-
+  // Fetch data
   useEffect(() => {
     fetchTransactions();
-  }, [fetchTransactions]);
+  }, [currentPage, filters, itemsPerPage]);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filters]);
 
   const isProfit =
     summary.totalIncome >= summary.totalExpense;
-
-
 
   const value = useMemo(() => ({
     transactions,
@@ -98,7 +99,8 @@ export const TransactionProvider = ({ children }) => {
     totalExpense: summary.totalExpense,
     isProfit,
     fetchTransactions,
-
+    itemsPerPage,
+    setItemsPerPage
   }), [
     transactions,
     loading,
@@ -107,9 +109,8 @@ export const TransactionProvider = ({ children }) => {
     currentPage,
     summary,
     isProfit,
-    fetchTransactions,
+    setItemsPerPage
   ]);
-
 
   return (
     <TransactionContext.Provider value={value}>

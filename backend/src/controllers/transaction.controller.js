@@ -46,64 +46,104 @@ const updateTransaction = asyncHandler(async (req, res) => {
     });
 });
 const getTransactions = asyncHandler(async (req, res) => {
-    let { page = 1, limit = 10, branch, type, category } = req.query;
 
-    page = parseInt(page);
-    limit = parseInt(limit);
+  let {
+    page = 1,
+    limit = 10,
+    branch,
+    type,
+    category,
+  } = req.query;
 
-    const skip = (page - 1) * limit;
+  page = parseInt(page);
+  limit = parseInt(limit);
 
+  const skip = (page - 1) * limit;
 
-    let filter = {};
+  let filter = {};
 
-    if (req.user.role === 'Admin') {
-        if (branch) {
-            filter.branch = new mongoose.Types.ObjectId(branch);
-        }
-    } else {
-        filter.branch = new mongoose.Types.ObjectId(req.user.branch);
+  // Role based filter
+  if (req.user.role === "Admin") {
+
+    if (branch) {
+      filter.branch =
+        new mongoose.Types.ObjectId(branch);
     }
 
-    if (type) filter.type = type;
-    if (category) filter.category = category;
+  } else {
 
-    const transactions = await Transaction.find(filter).populate('branch', 'name')
-        .sort({ createdAt: -1 })
-        .skip(skip)
-        .limit(limit);
+    filter.branch =
+      new mongoose.Types.ObjectId(
+        req.user.branch
+      );
 
-    // 📈 Total count
-    const totalCount = await Transaction.countDocuments(filter);
+  }
 
-    // 💰 Income & Expense totals
-    const totals = await Transaction.aggregate([
-        { $match: filter },
-        {
-            $group: {
-                _id: "$type",
-                total: { $sum: "$amount" }
-            }
-        }
+  // Optional filters
+  if (type) {
+    filter.type = type;
+  }
+
+  if (category) {
+    filter.category = category;
+  }
+
+  // Transactions
+  const transactions =
+    await Transaction.find(filter)
+      .populate("branch", "name")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+  // Count
+  const totalCount =
+    await Transaction.countDocuments(filter);
+
+  // Totals
+  const totals =
+    await Transaction.aggregate([
+      { $match: filter },
+
+      {
+        $group: {
+          _id: "$type",
+          total: {
+            $sum: "$amount",
+          },
+        },
+      },
     ]);
 
-    let totalIncome = 0;
-    let totalExpense = 0;
+  let totalIncome = 0;
 
-    totals.forEach((item) => {
-        if (item._id === "income") totalIncome = item.total;
-        if (item._id === "expense") totalExpense = item.total;
-    });
+  let totalExpense = 0;
 
-    res.json({
-        success: true,
-        page,
-        limit,
-        totalCount,
-        totalPages: Math.ceil(totalCount / limit),
-        totalIncome,
-        totalExpense,
-        data: transactions
-    });
+  totals.forEach((item) => {
+
+    if (item._id === "income") {
+      totalIncome = item.total;
+    }
+
+    if (item._id === "expense") {
+      totalExpense = item.total;
+    }
+
+  });
+
+  res.json({
+    success: true,
+    page,
+    limit,
+    totalPages: Math.ceil(
+      totalCount / limit
+    ),
+    totalCount,
+    totalIncome,
+    totalExpense,
+    data: transactions,
+  });
+
 });
 const deleteTransaction = asyncHandler(async (req, res) => {
     const { id } = req.params;

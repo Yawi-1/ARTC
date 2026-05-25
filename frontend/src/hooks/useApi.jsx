@@ -1,40 +1,55 @@
-import { useState } from "react";
-import axiosInstance from "../utils/axiosInstance";
+import { useState, useCallback } from "react";
+import axios from "axios";
 
 const useApi = () => {
+
   const [loading, setLoading] = useState(false);
+
   const [error, setError] = useState(null);
 
-  const callApi = async ({
-    method = "GET",
+  const callApi = useCallback(async ({
+    method,
     url,
-    data = null,
-    params = null,
-    headers = {},
+    data,
   }) => {
-    setLoading(true);
-    setError(null);
 
     try {
-      const response = await axiosInstance({
+
+      setLoading(true);
+
+      setError(null);
+
+      const res = await axios({
         method,
-        url,
+        url: `http://localhost:3000/api${url}`,
         data,
-        params,
-        headers,
+        withCredentials: true,
       });
 
-      return response.data;
-    } catch (err) {
-      const message = err.response?.data?.message || err.message;
-      setError(message);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
+      return res.data;
 
-  return { callApi, loading, error };
+    } catch (err) {
+
+      setError(
+        err.response?.data?.message ||
+        "Something went wrong"
+      );
+
+      console.log(err);
+
+    } finally {
+
+      setLoading(false);
+
+    }
+
+  }, []);
+
+  return {
+    callApi,
+    loading,
+    error,
+  };
 };
 
 export default useApi;
